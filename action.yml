@@ -1,0 +1,25 @@
+name: "Rust Linux GNU Builder"
+description: "Build rust binary linked to glibc 2.17"
+author: Aaron Griffin
+inputs:
+  args:
+    description: "Cargo arguments"
+    required: true
+    default: "build --release"
+  git_credentials:
+    description: "Git credentials - https://git-scm.com/docs/git-credential-store"
+    required: false
+  directory:
+    description: Relative path under $GITHUB_WORKSPACE where Cargo project is located
+    required: false
+runs:
+  using: "docker"
+  image: "docker://ghcr.io/sevco/rust-linux-gnu-action:1.59.0"
+  args:
+    - ${{ inputs.args }}
+    - ${{ inputs.directory }}
+    - ${{ inputs.credentials }}
+  post-entrypoint: "cleanup.sh"
+branding:
+  icon: box
+  color: orange
