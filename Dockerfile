@@ -1,5 +1,6 @@
-ARG TOOLCHAIN
 FROM centos:7
+
+ARG TOOLCHAIN
 
 ENV RUSTUP_HOME=/opt/rust/rustup \
     CARGO_HOME=/opt/rust/cargo \
@@ -18,7 +19,7 @@ RUN set -eux; \
     ls -al; \
     echo '49c96f3f74be82f4752b8bffcf81961dea5e6e94ce1ccba94435f12e871c3bdb *rustup-init' | sha256sum -c -; \
     chmod +x rustup-init; \
-    ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $TOOLCHAIN --default-host x86_64-unknown-linux-gnu; \
+    ./rustup-init -y --no-modify-path --profile minimal --default-toolchain ${TOOLCHAIN} --default-host x86_64-unknown-linux-gnu; \
     rm rustup-init; \
     chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
     rustup --version; \
