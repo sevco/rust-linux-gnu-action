@@ -1,0 +1,90 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      toolchain:
+        description: "Rust toolchain version"
+        required: true
+  schedule:
+    - cron: "0 0 * * 0/2"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # Fetches entire history, so we can analyze commits since last tag
+          fetch-depth: 0
+      - uses: actions-rs/toolchain@v1
+        if: github.event_name == 'schedule'
+        with:
+          toolchain: stable
+          override: true
+      - name: Get latest stable version
+        if: github.event_name == 'schedule'
+        run: |
+          LATEST=$(git describe --abbrev=0 --tags)
+          TOOLCHAIN=$(rustc --version | cut -d' ' -f2 )
+          echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
+          if [ "$LATEST" != "$TOOLCHAIN" ]; then
+              echo EXECUTE=true >> $GITHUB_ENV
+          else
+              echo EXECUTE=false >> $GITHUB_ENV
+          fi
+      - name: Set version
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "TOOLCHAIN=${{ github.event.inputs.toolchain }}" >> $GITHUB_ENV
+          echo EXECUTE=true >> $GITHUB_ENV
+      - name: Log in to GitHub Docker Registry
+        if: env.EXECUTE == 'true'
+        uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push Docker image
+        if: env.EXECUTE == 'true'
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          build-args: |
+            TOOLCHAIN=${{ env.TOOLCHAIN }}
+          tags: |
+            ghcr.io/sevco/rust-linux-gnu-action:${{ github.sha }}
+            ghcr.io/sevco/rust-linux-gnu-action:${{ env.TOOLCHAIN }}
+      - name: Update version in actions.yml
+        if: env.EXECUTE == 'true'
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: 'docker://ghcr.io/sevco/rust-linux-gnu-action:[^"]+'
+          replace: "docker://ghcr.io/sevco/rust-linux-gnu-action:${{ env.TOOLCHAIN }}"
+          include: "action.yml"
+      - name: Update version in README
+        if: env.EXECUTE == 'true'
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "sevco/rust-linux-gnu-action@.+"
+          replace: "sevco/rust-linux-gnu-action@${{ env.TOOLCHAIN }}"
+          include: "README.md"
+      - name: Commit and push
+        if: env.EXECUTE == 'true'
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "Updated actions container to ${{ env.TOOLCHAIN }}"
+          committer_name: GitHub Actions
+          committer_email: actions@github.com
+          add: '["action.yml", "README.md"]'
+          tag: ${{ env.TOOLCHAIN }}
+      - name: Create a GitHub release
+        if: env.EXECUTE == 'true'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "${{ env.TOOLCHAIN }}"
+          release_name: "Release ${{ env.TOOLCHAIN }}"
+          body: "${{ env.TOOLCHAIN }}"
