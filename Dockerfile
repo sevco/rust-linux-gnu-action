@@ -1,5 +1,5 @@
 ARG TOOLCHAIN
-FROM centos:7
+FROM centos:8
 
 ENV RUSTUP_HOME=/opt/rust/rustup \
     CARGO_HOME=/opt/rust/cargo \
