@@ -8,7 +8,7 @@ Rust Linux GNU Builder Action
 GitHub action for building rust binaries linked to glibc 2.17 (x86_64-unknown-linux-gnu - based on CentOS 7).
 
 ```yaml
-- uses: sevco/rust-linux-gnu-action@1.65.0
+- uses: sevco/rust-linux-gnu-action@1.66.0
   with:
     args: build --release --all-features
     git_credentials: ${{ secrets.GIT_CREDENTIALS }}
