@@ -14,7 +14,7 @@ inputs:
     required: false
 runs:
   using: "docker"
-  image: "docker://ghcr.io/sevco/rust-linux-gnu-action:1.67.1"
+  image: "docker://ghcr.io/sevco/rust-linux-gnu-action:1.68.0"
   args:
     - ${{ inputs.args }}
     - ${{ inputs.directory }}
