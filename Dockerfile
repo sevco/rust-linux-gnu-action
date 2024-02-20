@@ -29,8 +29,7 @@ RUN set -eux; \
     rm -rf /var/cache/yum && \
     printf '[net] \ngit-fetch-with-cli = true\n' >> /opt/rust/cargo/config
 
-RUN env CARGO_HOME=/opt/rust/cargo cargo install --git https://github.com/sevincit/cargo-rpm --branch=develop cargo-rpm && \
-    env CARGO_HOME=/opt/rust/cargo cargo install -f cargo-deb && \
+RUN env CARGO_HOME=/opt/rust/cargo cargo install -f cargo-deb && \
     rm -rf /opt/rust/cargo/registry/
 
 USER root
