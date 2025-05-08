@@ -31,7 +31,8 @@ RUN curl https://static.rust-lang.org/rustup/archive/1.28.2/x86_64-unknown-linux
     ./rustup-init -y --no-modify-path --profile minimal --default-toolchain ${TOOLCHAIN} --default-host x86_64-unknown-linux-gnu && \
     rm rustup-init && \
     chmod -R a+w $RUSTUP_HOME $CARGO_HOME && \
-    printf '[net] \ngit-fetch-with-cli = true\n' >> /opt/rust/cargo/config
+    printf '[net] \ngit-fetch-with-cli = true\n' >> /opt/rust/cargo/config && \
+    printf '[build] \ntarget = "x86_64-unknown-linux-gnu"\n' >> /opt/rust/cargo/config
 
 # Install cargo-deb
 RUN cargo install -f cargo-deb && \
