@@ -4,7 +4,7 @@ guard-%:
 		exit 1; \
 	fi
 
-test: IMAGE=$(shell docker build --build-arg TOOLCHAIN="$(TOOLCHAIN)" -q .) 
+test: IMAGE=$(shell docker build --build-arg TOOLCHAIN="$(TOOLCHAIN)" -q .)
 test: image build/rustls
 	mkdir -p build/.cargo && echo '\n[registries.test]\nindex="https://test.test/test.git"' > build/.cargo/config
 	echo "Building crate in container" && \
@@ -19,7 +19,7 @@ test: image build/rustls
 	@[ -d build/rustls/target/x86_64-unknown-linux-gnu ] || exit 1
 
 image: guard-TOOLCHAIN
-	docker build --build-arg TOOLCHAIN="$(TOOLCHAIN)" .	
+	docker build --build-arg TOOLCHAIN="$(TOOLCHAIN)" .
 
 .PHONY:
 clean:
