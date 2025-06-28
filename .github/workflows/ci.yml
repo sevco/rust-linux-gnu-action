@@ -10,6 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run test
         run: TOOLCHAIN=$(rustc --version | cut -d' ' -f2 ) make test
